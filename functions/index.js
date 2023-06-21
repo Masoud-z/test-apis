@@ -1,16 +1,19 @@
-const functions = require('firebase-functions');
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+admin.initializeApp();
+const firestore = admin.firestore();
+const db = admin.firestore();
+db.settings({ timestampsInSnapshots: true });
 
-// http request 1
-exports.randomNumber = functions.https.onRequest((request, response) => {
-  const number = Math.round(Math.random() * 100);
-  console.log(number);
-  response.send(number.toString());
+//Get people list
+exports.peopleList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("people")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        listArray.push({ ...doc.data(), id: doc.id });
+      });
+      response.send(listArray);
+    });
 });
-
-// http request 2
-exports.toTheDojo = functions.https.onRequest((request, response) => {
-  response.redirect('https://www.thenetninja.co.uk');
-});
-
-
-//Get people
