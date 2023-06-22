@@ -47,6 +47,7 @@
     <script src="https://www.gstatic.com/firebasejs/5.0.3/firebase-firestore.js"></script>
   </head>
   <body>
+    <button id="getData">Get Data</button>
     <script>
       const firebaseConfig = {
         apiKey: "AIzaSyClI9KaPIHEA82XuZ6ZACO1_ZVgT3m1LNs",
@@ -62,6 +63,17 @@
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
       db.settings({ timestampsInSnapshots: true });
+      const btn = document.getElementById("getData");
+      btn.addEventListener("click", () => {
+        console.log("clicked");
+        db.collection("people")
+          .doc("445J2hWbR5tEbWQZYLwk")
+          .get()
+          .then((snapshot) => {
+            const data = snapshot.data();
+            console.log({ ...data, id: snapshot.id });
+          });
+      });
     </script>
     <script src="app.js"></script>
   </body>
