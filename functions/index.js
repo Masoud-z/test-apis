@@ -174,21 +174,56 @@ exports.getOneCollection = functions.https.onRequest((request, response) => {
 
 //Create a collection
 exports.createCollection = functions.https.onRequest((request, response) => {
-  db.collection("collections")
-    .add(JSON.parse(request.body))
-    .then(() => {
-      response.status(200).send("Collection created");
+  const body = JSON.parse(request.body);
+  let people = [];
+  let users = [];
+  async function getPeople() {
+    await body.people.map((person) => {
+      people.push(db.collection("people").doc(person));
     });
+  }
+  async function getUsers() {
+    await body.users.map((user) => {
+      users.push(db.collection("users").doc(user));
+    });
+  }
+
+  getPeople().then(() => {
+    getUsers().then(() => {
+      db.collection("collections")
+        .add({ ...body.details, people: people, users: users })
+        .then(() => {
+          response.status(200).send("Collection created");
+        });
+    });
+  });
 });
 
 //Update a collection
 exports.updateCollection = functions.https.onRequest((request, response) => {
-  db.collection("collections")
-    .doc(request.query.id)
-    .update(JSON.parse(request.body))
-    .then(() => {
-      response.status(200).send("collection Updated");
+  const body = JSON.parse(request.body);
+  let people = [];
+  let users = [];
+  async function getPeople() {
+    await body.people.map((person) => {
+      people.push(db.collection("people").doc(person));
     });
+  }
+  async function getUsers() {
+    await body.users.map((user) => {
+      users.push(db.collection("users").doc(user));
+    });
+  }
+
+  getPeople().then(() => {
+    getUsers().then(() => {
+      db.collection("collections")
+        .update({ ...body.details, people: people, users: users })
+        .then(() => {
+          response.status(200).send("Collection created");
+        });
+    });
+  });
 });
 
 //Delete a collection
@@ -232,21 +267,56 @@ exports.getAnEvent = functions.https.onRequest((request, response) => {
 
 //Create an Event
 exports.createEvent = functions.https.onRequest((request, response) => {
-  db.collection("events")
-    .add(JSON.parse(request.body))
-    .then(() => {
-      response.status(200).send("Event created");
+  const body = JSON.parse(request.body);
+  let people = [];
+  let users = [];
+  async function getPeople() {
+    await body.people.map((person) => {
+      people.push(db.collection("people").doc(person));
     });
+  }
+  async function getUsers() {
+    await body.users.map(async (user) => {
+      users.push(db.collection("users").doc(user));
+    });
+  }
+
+  getPeople().then(() => {
+    getUsers().then(() => {
+      db.collection("events")
+        .add({ ...body.details, people: people, users: users })
+        .then(() => {
+          response.status(200).send("Event created");
+        });
+    });
+  });
 });
 
 //Update an Event
 exports.updateEvent = functions.https.onRequest((request, response) => {
-  db.collection("events")
-    .doc(request.query.id)
-    .update(JSON.parse(request.body))
-    .then(() => {
-      response.status(200).send("Event Updated");
+  const body = JSON.parse(request.body);
+  let people = [];
+  let users = [];
+  async function getPeople() {
+    await body.people.map((person) => {
+      people.push(db.collection("people").doc(person));
     });
+  }
+  async function getUsers() {
+    await body.users.map(async (user) => {
+      users.push(db.collection("users").doc(user));
+    });
+  }
+
+  getPeople().then(() => {
+    getUsers().then(() => {
+      db.collection("events")
+        .update({ ...body.details, people: people, users: users })
+        .then(() => {
+          response.status(200).send("Event created");
+        });
+    });
+  });
 });
 
 //Delete an Event
