@@ -1268,3 +1268,22 @@ exports.surveysList = functions.https.onRequest((request, response) => {
       response.status(200).send(listArray);
     });
 });
+
+//---------------++++transactions++++---------------
+//Get transactions list of a user
+exports.surveysList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("transactions")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        if (doc.data().users[0].id == request.query.requestorId) {
+          listArray.push({
+            ...doc.data(),
+            id: doc.id,
+          });
+        }
+      });
+      response.status(200).send(listArray);
+    });
+});
