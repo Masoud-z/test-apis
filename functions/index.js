@@ -622,7 +622,12 @@ exports.usersList = functions.https.onRequest((request, response) => {
     .get()
     .then((snapshot) => {
       snapshot.docs.forEach((doc) => {
-        listArray.push({ ...doc.data(), id: doc.id });
+        listArray.push({
+          ...doc.data(),
+          id: doc.id,
+          first_name: doc.data().display_name.split(" ")[0],
+          last_name: doc.data().display_name.split(" ")[1],
+        });
       });
       response.status(200).send(listArray);
     });
@@ -635,7 +640,12 @@ exports.getUser = functions.https.onRequest((request, response) => {
     .get()
     .then((snapshot) => {
       if (snapshot.id) {
-        const data = { ...snapshot.data(), id: snapshot.id };
+        const data = {
+          ...snapshot.data(),
+          id: snapshot.id,
+          first_name: snapshot.data().display_name.split(" ")[0],
+          last_name: snapshot.data().display_name.split(" ")[1],
+        };
         response.status(200).send(data);
       } else {
         response.status(404).send("No matching document found");
