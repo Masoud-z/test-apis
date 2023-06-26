@@ -1323,3 +1323,54 @@ exports.surveysList = functions.https.onRequest((request, response) => {
       response.status(200).send(listArray);
     });
 });
+
+//---------------++++organisationTags++++---------------
+//Get organisationTags list
+exports.surveysList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("organisationTags")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        listArray.push({
+          ...doc.data(),
+          id: doc.id,
+        });
+      });
+      response.status(200).send(listArray);
+    });
+});
+
+//---------------++++tags++++---------------
+//Get tags list
+exports.surveysList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("tags")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        listArray.push({
+          ...doc.data(),
+          id: doc.id,
+        });
+      });
+      response.status(200).send(listArray);
+    });
+});
+
+//---------------++++topicTags++++---------------
+//Get topicTags list
+exports.surveysList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("topicTags")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        listArray.push({
+          ...doc.data(),
+          id: doc.id,
+        });
+      });
+      response.status(200).send(listArray);
+    });
+});
