@@ -825,8 +825,8 @@ exports.CallRequestList = functions.https.onRequest((request, response) => {
     .get()
     .then((snapshot) => {
       snapshot.docs.forEach((doc) => {
-        if(doc.data().uid == request.query.uid)
-        listArray.push({ ...doc.data(), id: doc.id });
+        if (doc.data().requestor.id == request.query.requestorId)
+          listArray.push({ ...doc.data(), id: doc.id });
       });
       response.status(200).send(listArray);
     });
@@ -1187,7 +1187,6 @@ exports.deletePerson = functions.https.onRequest((request, response) => {
     });
 });
 
-
 //---------------++++surveys++++---------------
 //Get surveys list
 exports.surveysList = functions.https.onRequest((request, response) => {
@@ -1199,7 +1198,6 @@ exports.surveysList = functions.https.onRequest((request, response) => {
         listArray.push({
           ...doc.data(),
           id: doc.id,
-          namd: `${doc.data().first_name} ${doc.data().last_name}`,
         });
       });
       response.status(200).send(listArray);
@@ -1216,11 +1214,27 @@ exports.getsurvey = functions.https.onRequest((request, response) => {
         const data = {
           ...snapshot.data(),
           id: snapshot.id,
-          namd: `${doc.data().first_name} ${doc.data().last_name}`,
         };
         response.status(200).send(data);
       } else {
         response.status(404).send("No matching document found");
       }
+    });
+});
+
+//Get surveys list of a user
+exports.surveysList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("surveys")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        if (doc.data())
+          listArray.push({
+            ...doc.data(),
+            id: doc.id,
+          });
+      });
+      response.status(200).send(listArray);
     });
 });

@@ -66,16 +66,17 @@
       const btn = document.getElementById("getData");
       btn.addEventListener("click", () => {
         console.log("clicked");
-        const addedBalance = +"10";
-        db.collection("balances")
-          .doc("s92nnLFmJoDryUTuTtJh")
+        db.collection("activeEngagements")
           .get()
           .then((snapshot) => {
-            if (snapshot.id) {
-            } else {
-              console.log("No matching document found");
-            }
-          });
+            snapshot.docs.forEach((doc) => {
+              // if (doc.data().requestor.split("/")[2] == request.query.uid)
+              //   listArray.push({ ...doc.data(), id: doc.id });
+              console.log(doc.data().user);
+              console.log(doc.data().user.id);
+            });
+          })
+          .catch((err) => console.log(err));
       });
     </script>
     <script src="app.js"></script>
