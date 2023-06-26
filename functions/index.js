@@ -752,8 +752,6 @@ exports.deleteCallRecording = functions.https.onRequest((request, response) => {
     });
 });
 
-
-
 //---------------++++CallRequests++++---------------
 //Get CallRequests list
 exports.CallRequestList = functions.https.onRequest((request, response) => {
@@ -812,3 +810,351 @@ exports.deleteCallRequest = functions.https.onRequest((request, response) => {
     });
 });
 
+//---------------++++balances++++---------------
+
+//Create a Balance
+exports.createBalance = functions.https.onRequest((request, response) => {
+  db.collection("balances")
+    .add(JSON.parse(request.body))
+    .then(() => {
+      response.status(200).send("Balance created");
+    });
+});
+
+//Get a Balance
+exports.getBalance = functions.https.onRequest((request, response) => {
+  db.collection("balances")
+    .doc(request.query.id)
+    .get()
+    .then((snapshot) => {
+      if (snapshot.id) {
+        const data = { ...snapshot.data(), id: snapshot.id };
+        response.status(200).send(data);
+      } else {
+        response.status(404).send("No matching document found");
+      }
+    });
+});
+
+//Add Balance to a user
+exports.addBalance = functions.https.onRequest((request, response) => {
+  db.collection("balances")
+    .doc(request.query.id)
+    .get()
+    .then((snapshot) => {
+      //Get the balance added by user
+      const AddedBalance = +JSON.parse(request.body).AddedBalance;
+
+      if (snapshot.id) {
+        const data = { ...snapshot.data() };
+
+        db.collection("balances")
+          .doc(request.query.id)
+          .update({
+            ...data,
+            available_balance: data.available_balance + AddedBalance,
+            balance: data.balance + AddedBalance,
+          })
+          .then(() => {
+            db.collection("balances")
+              .doc(request.query.id)
+              .get()
+              .then((snapshot) => {
+                if (snapshot.id) {
+                  const data = { ...snapshot.data(), id: snapshot.id };
+                  response.status(200).send(data);
+                }
+              });
+          });
+      } else {
+        response.status(404).send("No matching document found");
+      }
+    });
+});
+
+//---------------++++callTranscriptions++++---------------
+//Get a callTranscription
+exports.getCallTranscription = functions.https.onRequest(
+  (request, response) => {
+    db.collection("callTranscriptions")
+      .doc(request.query.id)
+      .get()
+      .then((snapshot) => {
+        if (snapshot.id) {
+          const data = { ...snapshot.data(), id: snapshot.id };
+          response.status(200).send(data);
+        } else {
+          response.status(404).send("No matching document found");
+        }
+      });
+  }
+);
+
+//Create a CallTranscription
+exports.createCallTranscription = functions.https.onRequest(
+  (request, response) => {
+    db.collection("callTranscriptions")
+      .add(JSON.parse(request.body))
+      .then(() => {
+        response.status(200).send("CallTranscription created");
+      });
+  }
+);
+
+//Update a CallTranscription
+exports.updateCallTranscription = functions.https.onRequest((request, response) => {
+  db.collection("callTranscriptions")
+    .doc(request.query.id)
+    .update(JSON.parse(request.body))
+    .then(() => {
+      response.status(200).send("CallTranscription Updated");
+    });
+});
+
+//Delete a CallTranscription
+exports.deleteCallTranscription = functions.https.onRequest((request, response) => {
+  db.collection("callTranscriptions")
+    .doc(request.query.id)
+    .delete()
+    .then(() => {
+      response.status(200).send("CallTranscription Deleted");
+    });
+});
+
+//---------------++++DonationRequests++++---------------
+//Get DonationRequests list
+exports.DonationRequestsList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("donationRequests")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        listArray.push({ ...doc.data(), id: doc.id });
+      });
+      response.status(200).send(listArray);
+    });
+});
+
+//Get a DonationRequest
+exports.getDonationRequest = functions.https.onRequest((request, response) => {
+  db.collection("donationRequests")
+    .doc(request.query.id)
+    .get()
+    .then((snapshot) => {
+      if (snapshot.id) {
+        const data = { ...snapshot.data(), id: snapshot.id };
+        response.status(200).send(data);
+      } else {
+        response.status(404).send("No matching document found");
+      }
+    });
+});
+
+//Create a DonationRequest
+exports.createDonationRequest = functions.https.onRequest((request, response) => {
+  db.collection("donationRequests")
+    .add(JSON.parse(request.body))
+    .then(() => {
+      response.status(200).send("DonationRequest created");
+    });
+});
+
+//Update a DonationRequest
+exports.updateDonationRequest = functions.https.onRequest((request, response) => {
+  db.collection("donationRequests")
+    .doc(request.query.id)
+    .update(JSON.parse(request.body))
+    .then(() => {
+      response.status(200).send("DonationRequest Updated");
+    });
+});
+
+//Delete a DonationRequest
+exports.deleteDonationRequest = functions.https.onRequest((request, response) => {
+  db.collection("donationRequests")
+    .doc(request.query.id)
+    .delete()
+    .then(() => {
+      response.status(200).send("DonationRequest Deleted");
+    });
+});
+
+
+
+//---------------++++EventQuestions++++---------------
+//Get EventQuestions list
+exports.EventQuestionsList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("eventQuestions")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        listArray.push({ ...doc.data(), id: doc.id });
+      });
+      response.status(200).send(listArray);
+    });
+});
+
+//Get a EventQuestion
+exports.getEventQuestion = functions.https.onRequest((request, response) => {
+  db.collection("eventQuestions")
+    .doc(request.query.id)
+    .get()
+    .then((snapshot) => {
+      if (snapshot.id) {
+        const data = { ...snapshot.data(), id: snapshot.id };
+        response.status(200).send(data);
+      } else {
+        response.status(404).send("No matching document found");
+      }
+    });
+});
+
+//Create a EventQuestion
+exports.createEventQuestion = functions.https.onRequest((request, response) => {
+  db.collection("eventQuestions")
+    .add(JSON.parse(request.body))
+    .then(() => {
+      response.status(200).send("EventQuestion created");
+    });
+});
+
+//Update a EventQuestion
+exports.updateEventQuestion = functions.https.onRequest((request, response) => {
+  db.collection("eventQuestions")
+    .doc(request.query.id)
+    .update(JSON.parse(request.body))
+    .then(() => {
+      response.status(200).send("EventQuestion Updated");
+    });
+});
+
+//Delete a EventQuestion
+exports.deleteEventQuestion = functions.https.onRequest((request, response) => {
+  db.collection("eventQuestions")
+    .doc(request.query.id)
+    .delete()
+    .then(() => {
+      response.status(200).send("EventQuestion Deleted");
+    });
+});
+
+
+
+//---------------++++GeographicTags++++---------------
+//Get GeographicTags list
+exports.GeographicTagsList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("geographicTags")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        listArray.push({ ...doc.data(), id: doc.id });
+      });
+      response.status(200).send(listArray);
+    });
+});
+
+//Get a GeographicTag
+exports.getGeographicTag = functions.https.onRequest((request, response) => {
+  db.collection("geographicTags")
+    .doc(request.query.id)
+    .get()
+    .then((snapshot) => {
+      if (snapshot.id) {
+        const data = { ...snapshot.data(), id: snapshot.id };
+        response.status(200).send(data);
+      } else {
+        response.status(404).send("No matching document found");
+      }
+    });
+});
+
+//Create a GeographicTag
+exports.createGeographicTag = functions.https.onRequest((request, response) => {
+  db.collection("geographicTags")
+    .add(JSON.parse(request.body))
+    .then(() => {
+      response.status(200).send("GeographicTag created");
+    });
+});
+
+//Update a GeographicTag
+exports.updateGeographicTag = functions.https.onRequest((request, response) => {
+  db.collection("geographicTags")
+    .doc(request.query.id)
+    .update(JSON.parse(request.body))
+    .then(() => {
+      response.status(200).send("GeographicTag Updated");
+    });
+});
+
+//Delete a GeographicTag
+exports.deleteGeographicTag = functions.https.onRequest((request, response) => {
+  db.collection("geographicTags")
+    .doc(request.query.id)
+    .delete()
+    .then(() => {
+      response.status(200).send("GeographicTag Deleted");
+    });
+});
+
+
+
+//---------------++++InviteDocument++++---------------
+//Get InviteDocument list
+exports.inviteDocumentList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("inviteDocument")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        listArray.push({ ...doc.data(), id: doc.id });
+      });
+      response.status(200).send(listArray);
+    });
+});
+
+//Get a person
+exports.getPerson = functions.https.onRequest((request, response) => {
+  db.collection("inviteDocument")
+    .doc(request.query.id)
+    .get()
+    .then((snapshot) => {
+      if (snapshot.id) {
+        const data = { ...snapshot.data(), id: snapshot.id };
+        response.status(200).send(data);
+      } else {
+        response.status(404).send("No matching document found");
+      }
+    });
+});
+
+//Create a person
+exports.createPerson = functions.https.onRequest((request, response) => {
+  db.collection("inviteDocument")
+    .add(JSON.parse(request.body))
+    .then(() => {
+      response.status(200).send("Person created");
+    });
+});
+
+//Update a person
+exports.updatePerson = functions.https.onRequest((request, response) => {
+  db.collection("inviteDocument")
+    .doc(request.query.id)
+    .update(JSON.parse(request.body))
+    .then(() => {
+      response.status(200).send("Person Updated");
+    });
+});
+
+//Delete a person
+exports.deletePerson = functions.https.onRequest((request, response) => {
+  db.collection("inviteDocument")
+    .doc(request.query.id)
+    .delete()
+    .then(() => {
+      response.status(200).send("Person Deleted");
+    });
+});

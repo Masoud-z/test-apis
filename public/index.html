@@ -66,12 +66,35 @@
       const btn = document.getElementById("getData");
       btn.addEventListener("click", () => {
         console.log("clicked");
-        db.collection("people")
-          .doc("445J2hWbR5tEbWQZYLwk")
+        const addedBalance = +"10";
+        db.collection("balances")
+          .doc("s92nnLFmJoDryUTuTtJh")
           .get()
           .then((snapshot) => {
-            const data = snapshot.data();
-            console.log({ ...data, id: snapshot.id });
+            if (snapshot.id) {
+              const data = { ...snapshot.data() };
+
+              db.collection("balances")
+                .doc("s92nnLFmJoDryUTuTtJh")
+                .update({
+                  ...data,
+                  available_balance: data.available_balance + addedBalance,
+                  balance: data.balance + addedBalance,
+                })
+                .then(() => {
+                  db.collection("balances")
+                    .doc("s92nnLFmJoDryUTuTtJh")
+                    .get()
+                    .then((snapshot) => {
+                      if (snapshot.id) {
+                        const data = { ...snapshot.data() };
+                        console.log(data);
+                      }
+                    });
+                });
+            } else {
+              console.log("No matching document found");
+            }
           });
       });
     </script>
