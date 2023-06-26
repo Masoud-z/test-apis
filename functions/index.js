@@ -1229,7 +1229,7 @@ exports.surveysList = functions.https.onRequest((request, response) => {
     .get()
     .then((snapshot) => {
       snapshot.docs.forEach((doc) => {
-        if (doc.data())
+        if (doc.data().requestor.id == request.query.requestorId)
           listArray.push({
             ...doc.data(),
             id: doc.id,
