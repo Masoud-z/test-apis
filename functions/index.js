@@ -323,6 +323,20 @@ exports.deleteAnExpertRequest = functions.https.onRequest(
   }
 );
 
+//Get expertRequests list of a user
+exports.expertRequestsList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("expertRequests")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        if (doc.data().requestor.id == request.query.requestorId)
+          listArray.push({ ...doc.data(), id: doc.id });
+      });
+      response.status(200).send(listArray);
+    });
+});
+
 //---------------++++expertSuggestions++++---------------
 //Get expertSuggestions list
 exports.expertSuggestionsList = functions.https.onRequest(
@@ -570,6 +584,21 @@ exports.deleteNetworkRequest = functions.https.onRequest(
       });
   }
 );
+
+//Get networkRequests list of a user
+exports.networkRequestsList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("networkRequests")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        if (doc.data().requestor.id == request.query.requestorId) {
+          listArray.push({ ...doc.data(), id: doc.id });
+        }
+      });
+      response.status(200).send(listArray);
+    });
+});
 
 //---------------++++timezones++++---------------
 //Get timezones list
@@ -1229,11 +1258,12 @@ exports.surveysList = functions.https.onRequest((request, response) => {
     .get()
     .then((snapshot) => {
       snapshot.docs.forEach((doc) => {
-        if (doc.data().requestor.id == request.query.requestorId)
+        if (doc.data().requestor.id == request.query.requestorId) {
           listArray.push({
             ...doc.data(),
             id: doc.id,
           });
+        }
       });
       response.status(200).send(listArray);
     });
