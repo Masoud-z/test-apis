@@ -72,26 +72,6 @@
           .get()
           .then((snapshot) => {
             if (snapshot.id) {
-              const data = { ...snapshot.data() };
-
-              db.collection("balances")
-                .doc("s92nnLFmJoDryUTuTtJh")
-                .update({
-                  ...data,
-                  available_balance: data.available_balance + addedBalance,
-                  balance: data.balance + addedBalance,
-                })
-                .then(() => {
-                  db.collection("balances")
-                    .doc("s92nnLFmJoDryUTuTtJh")
-                    .get()
-                    .then((snapshot) => {
-                      if (snapshot.id) {
-                        const data = { ...snapshot.data() };
-                        console.log(data);
-                      }
-                    });
-                });
             } else {
               console.log("No matching document found");
             }

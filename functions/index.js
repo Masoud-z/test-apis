@@ -17,7 +17,11 @@ exports.peopleList = functions.https.onRequest((request, response) => {
     .get()
     .then((snapshot) => {
       snapshot.docs.forEach((doc) => {
-        listArray.push({ ...doc.data(), id: doc.id });
+        listArray.push({
+          ...doc.data(),
+          id: doc.id,
+          namd: `${doc.data().first_name} ${doc.data().last_name}`,
+        });
       });
       response.status(200).send(listArray);
     });
@@ -30,7 +34,11 @@ exports.getPerson = functions.https.onRequest((request, response) => {
     .get()
     .then((snapshot) => {
       if (snapshot.id) {
-        const data = { ...snapshot.data(), id: snapshot.id };
+        const data = {
+          ...snapshot.data(),
+          id: snapshot.id,
+          namd: `${doc.data().first_name} ${doc.data().last_name}`,
+        };
         response.status(200).send(data);
       } else {
         response.status(404).send("No matching document found");
@@ -810,6 +818,20 @@ exports.deleteCallRequest = functions.https.onRequest((request, response) => {
     });
 });
 
+//Get CallRequests list of a user
+exports.CallRequestList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("callRequests")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        if(doc.data().uid == request.query.uid)
+        listArray.push({ ...doc.data(), id: doc.id });
+      });
+      response.status(200).send(listArray);
+    });
+});
+
 //---------------++++balances++++---------------
 
 //Create a Balance
@@ -902,38 +924,44 @@ exports.createCallTranscription = functions.https.onRequest(
 );
 
 //Update a CallTranscription
-exports.updateCallTranscription = functions.https.onRequest((request, response) => {
-  db.collection("callTranscriptions")
-    .doc(request.query.id)
-    .update(JSON.parse(request.body))
-    .then(() => {
-      response.status(200).send("CallTranscription Updated");
-    });
-});
+exports.updateCallTranscription = functions.https.onRequest(
+  (request, response) => {
+    db.collection("callTranscriptions")
+      .doc(request.query.id)
+      .update(JSON.parse(request.body))
+      .then(() => {
+        response.status(200).send("CallTranscription Updated");
+      });
+  }
+);
 
 //Delete a CallTranscription
-exports.deleteCallTranscription = functions.https.onRequest((request, response) => {
-  db.collection("callTranscriptions")
-    .doc(request.query.id)
-    .delete()
-    .then(() => {
-      response.status(200).send("CallTranscription Deleted");
-    });
-});
+exports.deleteCallTranscription = functions.https.onRequest(
+  (request, response) => {
+    db.collection("callTranscriptions")
+      .doc(request.query.id)
+      .delete()
+      .then(() => {
+        response.status(200).send("CallTranscription Deleted");
+      });
+  }
+);
 
 //---------------++++DonationRequests++++---------------
 //Get DonationRequests list
-exports.DonationRequestsList = functions.https.onRequest((request, response) => {
-  const listArray = [];
-  db.collection("donationRequests")
-    .get()
-    .then((snapshot) => {
-      snapshot.docs.forEach((doc) => {
-        listArray.push({ ...doc.data(), id: doc.id });
+exports.DonationRequestsList = functions.https.onRequest(
+  (request, response) => {
+    const listArray = [];
+    db.collection("donationRequests")
+      .get()
+      .then((snapshot) => {
+        snapshot.docs.forEach((doc) => {
+          listArray.push({ ...doc.data(), id: doc.id });
+        });
+        response.status(200).send(listArray);
       });
-      response.status(200).send(listArray);
-    });
-});
+  }
+);
 
 //Get a DonationRequest
 exports.getDonationRequest = functions.https.onRequest((request, response) => {
@@ -951,35 +979,39 @@ exports.getDonationRequest = functions.https.onRequest((request, response) => {
 });
 
 //Create a DonationRequest
-exports.createDonationRequest = functions.https.onRequest((request, response) => {
-  db.collection("donationRequests")
-    .add(JSON.parse(request.body))
-    .then(() => {
-      response.status(200).send("DonationRequest created");
-    });
-});
+exports.createDonationRequest = functions.https.onRequest(
+  (request, response) => {
+    db.collection("donationRequests")
+      .add(JSON.parse(request.body))
+      .then(() => {
+        response.status(200).send("DonationRequest created");
+      });
+  }
+);
 
 //Update a DonationRequest
-exports.updateDonationRequest = functions.https.onRequest((request, response) => {
-  db.collection("donationRequests")
-    .doc(request.query.id)
-    .update(JSON.parse(request.body))
-    .then(() => {
-      response.status(200).send("DonationRequest Updated");
-    });
-});
+exports.updateDonationRequest = functions.https.onRequest(
+  (request, response) => {
+    db.collection("donationRequests")
+      .doc(request.query.id)
+      .update(JSON.parse(request.body))
+      .then(() => {
+        response.status(200).send("DonationRequest Updated");
+      });
+  }
+);
 
 //Delete a DonationRequest
-exports.deleteDonationRequest = functions.https.onRequest((request, response) => {
-  db.collection("donationRequests")
-    .doc(request.query.id)
-    .delete()
-    .then(() => {
-      response.status(200).send("DonationRequest Deleted");
-    });
-});
-
-
+exports.deleteDonationRequest = functions.https.onRequest(
+  (request, response) => {
+    db.collection("donationRequests")
+      .doc(request.query.id)
+      .delete()
+      .then(() => {
+        response.status(200).send("DonationRequest Deleted");
+      });
+  }
+);
 
 //---------------++++EventQuestions++++---------------
 //Get EventQuestions list
@@ -1039,8 +1071,6 @@ exports.deleteEventQuestion = functions.https.onRequest((request, response) => {
     });
 });
 
-
-
 //---------------++++GeographicTags++++---------------
 //Get GeographicTags list
 exports.GeographicTagsList = functions.https.onRequest((request, response) => {
@@ -1099,8 +1129,6 @@ exports.deleteGeographicTag = functions.https.onRequest((request, response) => {
     });
 });
 
-
-
 //---------------++++InviteDocument++++---------------
 //Get InviteDocument list
 exports.inviteDocumentList = functions.https.onRequest((request, response) => {
@@ -1115,7 +1143,7 @@ exports.inviteDocumentList = functions.https.onRequest((request, response) => {
     });
 });
 
-//Get a person
+//Get an InviteDocument
 exports.getPerson = functions.https.onRequest((request, response) => {
   db.collection("inviteDocument")
     .doc(request.query.id)
@@ -1130,31 +1158,50 @@ exports.getPerson = functions.https.onRequest((request, response) => {
     });
 });
 
-//Create a person
+//Create an InviteDocument
 exports.createPerson = functions.https.onRequest((request, response) => {
   db.collection("inviteDocument")
     .add(JSON.parse(request.body))
     .then(() => {
-      response.status(200).send("Person created");
+      response.status(200).send("InviteDocument created");
     });
 });
 
-//Update a person
+//Update an InviteDocument
 exports.updatePerson = functions.https.onRequest((request, response) => {
   db.collection("inviteDocument")
     .doc(request.query.id)
     .update(JSON.parse(request.body))
     .then(() => {
-      response.status(200).send("Person Updated");
+      response.status(200).send("InviteDocument Updated");
     });
 });
 
-//Delete a person
+//Delete an InviteDocument
 exports.deletePerson = functions.https.onRequest((request, response) => {
   db.collection("inviteDocument")
     .doc(request.query.id)
     .delete()
     .then(() => {
-      response.status(200).send("Person Deleted");
+      response.status(200).send("InviteDocument Deleted");
+    });
+});
+
+
+//---------------++++surveys++++---------------
+//Get surveys list
+exports.surveysList = functions.https.onRequest((request, response) => {
+  const listArray = [];
+  db.collection("surveys")
+    .get()
+    .then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        listArray.push({
+          ...doc.data(),
+          id: doc.id,
+          namd: `${doc.data().first_name} ${doc.data().last_name}`,
+        });
+      });
+      response.status(200).send(listArray);
     });
 });
