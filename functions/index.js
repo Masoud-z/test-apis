@@ -907,6 +907,17 @@ exports.addBalance = functions.https.onRequest((request, response) => {
             balance: data.balance + AddedBalance,
           })
           .then(() => {
+            //Create a Transaction
+            db.collection("transactions")
+              .add({
+                amount: AddedBalance,
+                created_time: new Date.now(),
+                type: "I/O",
+                to: data.user,
+                users: [data.user],
+              })
+              .then(() => {});
+
             db.collection("balances")
               .doc(request.query.id)
               .get()
@@ -920,6 +931,21 @@ exports.addBalance = functions.https.onRequest((request, response) => {
       } else {
         response.status(404).send("No matching document found");
       }
+    });
+});
+
+//Get a Balance of a user
+exports.getBalance = functions.https.onRequest((request, response) => {
+  db.collection("balances")
+    .get()
+    .then((snapshot) => {
+      let data;
+      snapshot.docs.forEach((doc) => {
+        if (doc.data().user.id == request.query.userId) {
+          data = { ...doc.data(), id: snapshot.id };
+        }
+      });
+      response.status(200).send(data);
     });
 });
 
