@@ -1205,3 +1205,22 @@ exports.surveysList = functions.https.onRequest((request, response) => {
       response.status(200).send(listArray);
     });
 });
+
+//Get a survey
+exports.getsurvey = functions.https.onRequest((request, response) => {
+  db.collection("surveys")
+    .doc(request.query.id)
+    .get()
+    .then((snapshot) => {
+      if (snapshot.id) {
+        const data = {
+          ...snapshot.data(),
+          id: snapshot.id,
+          namd: `${doc.data().first_name} ${doc.data().last_name}`,
+        };
+        response.status(200).send(data);
+      } else {
+        response.status(404).send("No matching document found");
+      }
+    });
+});
