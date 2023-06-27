@@ -49,7 +49,7 @@ exports.getPerson = functions.https.onRequest((request, response) => {
 //Create a person
 exports.createPerson = functions.https.onRequest((request, response) => {
   db.collection("people")
-    .add(JSON.parse(request.body))
+    .add({ ...JSON.parse(request.body), created_time: new Date() })
     .then(() => {
       response.status(200).send("Person created");
     });
@@ -191,7 +191,12 @@ exports.createCollection = functions.https.onRequest((request, response) => {
   getPeople().then(() => {
     getUsers().then(() => {
       db.collection("collections")
-        .add({ ...body.details, people: people, users: users })
+        .add({
+          ...body.details,
+          people: people,
+          users: users,
+          created_time: new Date(),
+        })
         .then(() => {
           response.status(200).send("Collection created");
         });
@@ -284,7 +289,12 @@ exports.createEvent = functions.https.onRequest((request, response) => {
   getPeople().then(() => {
     getUsers().then(() => {
       db.collection("events")
-        .add({ ...body.details, people: people, users: users })
+        .add({
+          ...body.details,
+          people: people,
+          users: users,
+          created_time: new Date(),
+        })
         .then(() => {
           response.status(200).send("Event created");
         });
@@ -362,7 +372,7 @@ exports.getAnExpertRequest = functions.https.onRequest((request, response) => {
 exports.createAnExpertRequest = functions.https.onRequest(
   (request, response) => {
     db.collection("expertRequests")
-      .add(JSON.parse(request.body))
+      .add({ ...JSON.parse(request.body), created_time: new Date() })
       .then(() => {
         response.status(200).send("ExpertRequest created");
       });
@@ -444,7 +454,7 @@ exports.getAnExpertSuggestion = functions.https.onRequest(
 exports.createAnExpertSuggestion = functions.https.onRequest(
   (request, response) => {
     db.collection("expertSuggestions")
-      .add(JSON.parse(request.body))
+      .add({ ...JSON.parse(request.body), created_time: new Date() })
       .then(() => {
         response.status(200).send("ExpertSuggestion created");
       });
@@ -507,7 +517,7 @@ exports.getFeedback = functions.https.onRequest((request, response) => {
 //Create a Feedback
 exports.createFeedback = functions.https.onRequest((request, response) => {
   db.collection("feedback")
-    .add(JSON.parse(request.body))
+    .add({ ...JSON.parse(request.body), created_time: new Date() })
     .then(() => {
       response.status(200).send("Feedback created");
     });
@@ -565,7 +575,7 @@ exports.getAnIndustrie = functions.https.onRequest((request, response) => {
 //Create an Industrie
 exports.createAnIndustrie = functions.https.onRequest((request, response) => {
   db.collection("industries")
-    .add(JSON.parse(request.body))
+    .add({ ...JSON.parse(request.body), created_time: new Date() })
     .then(() => {
       response.status(200).send("Industrie created");
     });
@@ -624,7 +634,7 @@ exports.getNetworkRequest = functions.https.onRequest((request, response) => {
 exports.createNetworkRequest = functions.https.onRequest(
   (request, response) => {
     db.collection("networkRequests")
-      .add(JSON.parse(request.body))
+      .add({ ...JSON.parse(request.body), created_time: new Date() })
       .then(() => {
         response.status(200).send("NetworkRequest created");
       });
@@ -726,7 +736,7 @@ exports.getUser = functions.https.onRequest((request, response) => {
 //Create a user
 exports.createUser = functions.https.onRequest((request, response) => {
   db.collection("users")
-    .add(JSON.parse(request.body))
+    .add({ ...JSON.parse(request.body), created_time: new Date() })
     .then(() => {
       response.status(200).send("User created");
     });
@@ -785,7 +795,7 @@ exports.getAnAiQuestion = functions.https.onRequest((request, response) => {
 //Create an AiQuestion
 exports.createAnAiQuestion = functions.https.onRequest((request, response) => {
   db.collection("aiQuestions")
-    .add(JSON.parse(request.body))
+    .add({ ...JSON.parse(request.body), created_time: new Date() })
     .then(() => {
       response.status(200).send("AiQuestion created");
     });
@@ -843,7 +853,7 @@ exports.getCallRecording = functions.https.onRequest((request, response) => {
 //Create a CallRecording
 exports.createCallRecording = functions.https.onRequest((request, response) => {
   db.collection("callRecordings")
-    .add(JSON.parse(request.body))
+    .add({ ...JSON.parse(request.body), created_time: new Date() })
     .then(() => {
       response.status(200).send("CallRecording created");
     });
@@ -901,7 +911,7 @@ exports.getCallRequest = functions.https.onRequest((request, response) => {
 //Create a CallRequest
 exports.createCallRequest = functions.https.onRequest((request, response) => {
   db.collection("callRequests")
-    .add(JSON.parse(request.body))
+    .add({ ...JSON.parse(request.body), created_time: new Date() })
     .then(() => {
       response.status(200).send("CallRequest created");
     });
@@ -946,7 +956,7 @@ exports.CallRequestList = functions.https.onRequest((request, response) => {
 //Create a Balance
 exports.createBalance = functions.https.onRequest((request, response) => {
   db.collection("balances")
-    .add(JSON.parse(request.body))
+    .add({ ...JSON.parse(request.body), created_time: new Date() })
     .then(() => {
       response.status(200).send("Balance created");
     });
@@ -975,12 +985,13 @@ exports.addBalance = functions.https.onRequest((request, response) => {
     .then((snapshot) => {
       //Get the balance added by user
       const AddedBalance = +JSON.parse(request.body).AddedBalance;
+      const balanceID = JSON.parse(request.body).balanceId;
 
       if (snapshot.id) {
         const data = { ...snapshot.data() };
 
         db.collection("balances")
-          .doc(request.query.id)
+          .doc(balanceID)
           .update({
             ...data,
             available_balance: data.available_balance + AddedBalance,
@@ -991,21 +1002,21 @@ exports.addBalance = functions.https.onRequest((request, response) => {
             db.collection("transactions")
               .add({
                 amount: AddedBalance,
-                created_time: new Date.now(),
+                created_time: new Date(),
                 type: "I/O",
                 to: data.user,
                 users: [data.user],
               })
-              .then(() => {});
-
-            db.collection("balances")
-              .doc(request.query.id)
-              .get()
-              .then((snapshot) => {
-                if (snapshot.id) {
-                  const data = { ...snapshot.data(), id: snapshot.id };
-                  response.status(200).send(data);
-                }
+              .then(() => {
+                db.collection("balances")
+                  .doc(balanceID)
+                  .get()
+                  .then((snapshot) => {
+                    if (snapshot.id) {
+                      const data = { ...snapshot.data(), id: snapshot.id };
+                      response.status(200).send(data);
+                    }
+                  });
               });
           });
       } else {
@@ -1051,7 +1062,7 @@ exports.getCallTranscription = functions.https.onRequest(
 exports.createCallTranscription = functions.https.onRequest(
   (request, response) => {
     db.collection("callTranscriptions")
-      .add(JSON.parse(request.body))
+      .add({ ...JSON.parse(request.body), created_time: new Date() })
       .then(() => {
         response.status(200).send("CallTranscription created");
       });
@@ -1117,7 +1128,7 @@ exports.getDonationRequest = functions.https.onRequest((request, response) => {
 exports.createDonationRequest = functions.https.onRequest(
   (request, response) => {
     db.collection("donationRequests")
-      .add(JSON.parse(request.body))
+      .add({ ...JSON.parse(request.body), created_time: new Date() })
       .then(() => {
         response.status(200).send("DonationRequest created");
       });
@@ -1180,7 +1191,7 @@ exports.getEventQuestion = functions.https.onRequest((request, response) => {
 //Create a EventQuestion
 exports.createEventQuestion = functions.https.onRequest((request, response) => {
   db.collection("eventQuestions")
-    .add(JSON.parse(request.body))
+    .add({ ...JSON.parse(request.body), created_time: new Date() })
     .then(() => {
       response.status(200).send("EventQuestion created");
     });
@@ -1238,7 +1249,7 @@ exports.getGeographicTag = functions.https.onRequest((request, response) => {
 //Create a GeographicTag
 exports.createGeographicTag = functions.https.onRequest((request, response) => {
   db.collection("geographicTags")
-    .add(JSON.parse(request.body))
+    .add({ ...JSON.parse(request.body), created_time: new Date() })
     .then(() => {
       response.status(200).send("GeographicTag created");
     });
@@ -1296,7 +1307,7 @@ exports.getPerson = functions.https.onRequest((request, response) => {
 //Create an InviteDocument
 exports.createPerson = functions.https.onRequest((request, response) => {
   db.collection("inviteDocument")
-    .add(JSON.parse(request.body))
+    .add({ ...JSON.parse(request.body), created_time: new Date() })
     .then(() => {
       response.status(200).send("InviteDocument created");
     });

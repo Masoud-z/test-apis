@@ -64,19 +64,42 @@
       const db = firebase.firestore();
       db.settings({ timestampsInSnapshots: true });
       const btn = document.getElementById("getData");
+
       btn.addEventListener("click", () => {
         console.log("clicked");
-        db.collection("activeEngagements")
-          .get()
-          .then((snapshot) => {
-            snapshot.docs.forEach((doc) => {
-              // if (doc.data().requestor.split("/")[2] == request.query.uid)
-              //   listArray.push({ ...doc.data(), id: doc.id });
-              console.log(doc.data().user);
-              console.log(doc.data().user.id);
-            });
-          })
-          .catch((err) => console.log(err));
+        const body = {
+          people: ["445J2hWbR5tEbWQZYLwk"],
+          users: ["GdD8D2mBi8771LgEM8X4"],
+          details: {
+            category: "Around The World",
+            created_time: new Date(),
+            name: "Colombia",
+            photo_url:
+              "https://firebasestorage.googleapis.com/v0/b/cassandra-app-a1761.appspot.com/o/users%2FUmLfvnWE06WquBhxZmSaDJpuvi93%2Fuploads%2F1665413439047000.png?alt=media&token=aed653d9-d914-4283-b4a9-730a97bacad0",
+          },
+        };
+        let people = [];
+        let users = [];
+        async function getPeople() {
+          await body.people.map((person) => {
+            people.push(db.collection("people").doc(person));
+          });
+        }
+        async function getUsers() {
+          await body.users.map((user) => {
+            users.push(db.collection("users").doc(user));
+          });
+        }
+
+        getPeople().then(() => {
+          getUsers().then(() => {
+            db.collection("collections")
+              .add({ ...body.details, people: people, users: users })
+              .then(() => {
+                console.log("Collection created");
+              });
+          });
+        });
       });
     </script>
     <script src="app.js"></script>
